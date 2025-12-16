@@ -648,3 +648,7 @@ target = "nockchain/common/zoon"
 [[alias]]
 name = "nockchain/zose"
 target = "nockchain/common/zose"
+
+[[alias]]
+name = "nockchain/wallet"
+target = "nockchain/apps/wallet/wallet"
