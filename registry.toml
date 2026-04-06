@@ -30,6 +30,12 @@ ref = "a19ad4dc"
 description = "Nockchain standard library"
 root_path = "hoon"
 
+[workspace.vesl]
+git_url = "https://github.com/zkVesl/vesl"
+ref = "c52a4d46"
+description = "Compile-time Hoon testing library"
+root_path = "hoon"
+
 # ============================================================================
 # Packages
 # ============================================================================
@@ -605,6 +611,14 @@ path = "hoon"
 file = "trivial.hoon"
 dependencies = []
 
+# Vesl — compile-time testing
+[[package]]
+name = "vesl/lib/vesl-test"
+workspace = "vesl"
+path = "lib"
+file = "vesl-test.hoon"
+dependencies = []
+
 # ============================================================================
 # Aliases
 # ============================================================================
@@ -652,3 +666,7 @@ target = "nockchain/common/zose"
 [[alias]]
 name = "nockchain/wallet"
 target = "nockchain/apps/wallet/wallet"
+
+[[alias]]
+name = "vesl/test"
+target = "vesl/lib/vesl-test"
