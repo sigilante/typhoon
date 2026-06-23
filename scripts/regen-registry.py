@@ -89,6 +89,12 @@ WORKSPACES = {
         "description": "Sequent: list operations for mortal developers",
         "root_path": "desk",
     },
+    "yard": {
+        "git_url": "https://github.com/urbit/yard",
+        "ref": "ce5cb82",
+        "description": "Yard: curated community Hoon libraries (Urbit Foundation)",
+        "root_path": "desk",
+    },
 }
 
 # Curated urbit packages (name, path, file, dependencies) -- not import-derived.
@@ -155,6 +161,19 @@ FORD_FAMILIES = [
             {"workspace": "sequent", "subdir": "lib", "stems": ["seq"]},
         ],
     },
+    {
+        # General-purpose, zero-dependency libs from the yard desk. Sail/print
+        # (Tier B) and gall-agent helpers (Tier C) are intentionally omitted; the
+        # exact duplicates of libs we already index (seq, twoc, test) are skipped.
+        "family": "yard",
+        "checkout": "yard",
+        "name_prefix": "yard",
+        "specs": [
+            {"workspace": "yard", "subdir": "lib",
+             "stems": ["string", "regex", "csv", "mip",
+                       "number-to-words", "math", "etch", "cram"]},
+        ],
+    },
 ]
 
 # Default checkout locations (override with --checkout family=/path).
@@ -162,6 +181,7 @@ CHECKOUTS = {
     "nockchain": "/tmp/nockchain",
     "numerics": "/tmp/numerics",
     "sequent": "/tmp/sequent-repo",
+    "yard": "/tmp/yard",
 }
 
 ALIASES = [
@@ -453,6 +473,7 @@ def emit(packages):
         "nockchain": "# Nockchain standard library (nockchain/nockchain, hoon/)",
         "numerics": "# urbit/numerics: math primitives, lagoon (linalg), saloon (decompositions)",
         "sequent": "# jackfoxy/sequent: list operations",
+        "yard": "# urbit/yard: curated general-purpose libraries (Urbit Foundation)",
     }
     last_ws_group = None
     for p in packages:

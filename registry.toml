@@ -50,6 +50,12 @@ ref = "7fc95fd"
 description = "Sequent: list operations for mortal developers"
 root_path = "desk"
 
+[workspace.yard]
+git_url = "https://github.com/urbit/yard"
+ref = "ce5cb82"
+description = "Yard: curated community Hoon libraries (Urbit Foundation)"
+root_path = "desk"
+
 # ============================================================================
 # Packages
 # ============================================================================
@@ -728,6 +734,63 @@ name = "sequent/seq"
 workspace = "sequent"
 path = "lib"
 file = "seq.hoon"
+dependencies = []
+
+# urbit/yard: curated general-purpose libraries (Urbit Foundation)
+[[package]]
+name = "yard/string"
+workspace = "yard"
+path = "lib"
+file = "string.hoon"
+dependencies = []
+
+[[package]]
+name = "yard/regex"
+workspace = "yard"
+path = "lib"
+file = "regex.hoon"
+dependencies = []
+
+[[package]]
+name = "yard/csv"
+workspace = "yard"
+path = "lib"
+file = "csv.hoon"
+dependencies = []
+
+[[package]]
+name = "yard/mip"
+workspace = "yard"
+path = "lib"
+file = "mip.hoon"
+dependencies = []
+
+[[package]]
+name = "yard/number-to-words"
+workspace = "yard"
+path = "lib"
+file = "number-to-words.hoon"
+dependencies = []
+
+[[package]]
+name = "yard/math"
+workspace = "yard"
+path = "lib"
+file = "math.hoon"
+dependencies = []
+
+[[package]]
+name = "yard/etch"
+workspace = "yard"
+path = "lib"
+file = "etch.hoon"
+dependencies = []
+
+[[package]]
+name = "yard/cram"
+workspace = "yard"
+path = "lib"
+file = "cram.hoon"
 dependencies = []
 
 # ============================================================================
