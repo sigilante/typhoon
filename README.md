@@ -1,9 +1,7 @@
 # TYPHOON
 ## TYPical HOON Registry
 
-**Status:** Works with Nockup. `nockchain` is pinned at `6d29078` (2026-06-22); see
-`registry.toml` for the exact ref of every workspace. Update requests are welcome
-as issues or PRs.
+**Status ~2026.6.22** Typhoon works with Nockup. `nockchain` is pinned at `6d29078` (2026-06-22); see `registry.toml` for the exact ref of every workspace. Update requests are welcome as issues or PRs.
 
 ![](./img/hero.jpg)
 
