@@ -1,0 +1,33 @@
+name: registry
+
+# Guards the policy that registry.toml is a generated artifact: it must always
+# match what scripts/regen-registry.py derives from the pinned upstream sources,
+# and every dependency / alias must resolve. Catches both hand-edits that bypass
+# the generator and dependency lists that have drifted from actual imports.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # generate --check re-derives the registry from the upstreams pinned in the
+      # script's WORKSPACES table (it shallow-clones nockchain / numerics / sequent
+      # on demand; urbit is explicit config and is never cloned) and fails on any
+      # semantic drift from the committed registry.toml.
+      - name: Check registry is in sync with sources
+        run: python3 scripts/regen-registry.py generate --check
+
+      # validate confirms every dependency and alias in the committed file resolves.
+      - name: Validate registry resolvability
+        run: python3 scripts/regen-registry.py validate

@@ -41,7 +41,11 @@ scripts/regen-registry.py validate
 
 To bump an upstream, edit its `ref` in the `WORKSPACES` table at the top of
 `scripts/regen-registry.py` and re-run `generate`. The script reuses local
-checkouts (defaults under `/tmp`, override with `--checkout name=/path`) and
-shallow-clones at the pinned ref otherwise. Requires Python 3.11+ (standard
+checkouts (defaults under your temp dir, override with `--checkout name=/path`)
+and shallow-clones at the pinned ref otherwise. Requires Python 3.11+ (standard
 library only). The curated `urbit` selection and all aliases also live in that
 config table.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full maintenance policy and the
+upgrade runbook. CI (`.github/workflows/registry.yml`) runs `generate --check`
+on every push and PR, so a hand-edit that bypasses the generator fails the build.
