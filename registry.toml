@@ -15,26 +15,46 @@ default_ref = "latest"
 # ============================================================================
 
 [workspace.urbit]
-# Public Git URL
 git_url = "https://github.com/urbit/urbit"
-# Tag or commit hash
 ref = "409k"
-# Plaintext description
 description = "Urbit OS"
-# Path in repo; preserve structure after this point
 root_path = "pkg/arvo"
 
 [workspace.nockchain]
 git_url = "https://github.com/nockchain/nockchain"
-ref = "a19ad4dc"
+ref = "6d29078"
 description = "Nockchain standard library"
 root_path = "hoon"
+
+[workspace.numerics-math]
+git_url = "https://github.com/urbit/numerics"
+ref = "043a437"
+description = "Numerics: shared math primitives (libmath desk)"
+root_path = "libmath/desk"
+
+[workspace.numerics-lagoon]
+git_url = "https://github.com/urbit/numerics"
+ref = "043a437"
+description = "Lagoon: vector/matrix linear algebra (lagoon desk)"
+root_path = "lagoon/desk"
+
+[workspace.numerics-saloon]
+git_url = "https://github.com/urbit/numerics"
+ref = "043a437"
+description = "Saloon: eigen/decomposition routines (saloon desk)"
+root_path = "saloon/desk"
+
+[workspace.sequent]
+git_url = "https://github.com/jackfoxy/sequent"
+ref = "7fc95fd"
+description = "Sequent: list operations for mortal developers"
+root_path = "desk"
 
 # ============================================================================
 # Packages
 # ============================================================================
 
-# Urbit standard libraries from /sys
+# Urbit (urbit/urbit, pkg/arvo): /sys stdlib, vanes, /lib
 [[package]]
 name = "urbit/hoon"
 workspace = "urbit"
@@ -63,7 +83,6 @@ path = "sys"
 file = "arvo.hoon"
 dependencies = ["urbit/lull", "urbit/zuse"]
 
-# Urbit vanes from /sys/vanes
 [[package]]
 name = "urbit/ames"
 workspace = "urbit"
@@ -134,7 +153,6 @@ path = "sys/vanes"
 file = "lick.hoon"
 dependencies = ["urbit/arvo"]
 
-# Urbit libraries from /lib
 [[package]]
 name = "urbit/bits"
 workspace = "urbit"
@@ -184,41 +202,76 @@ path = "lib"
 file = "tiny.hoon"
 dependencies = []
 
-# Nockchain standard library
+# Nockchain standard library (nockchain/nockchain, hoon/)
+[[package]]
+name = "nockchain/apps/bridge/base"
+workspace = "nockchain"
+path = "apps/bridge"
+file = "base.hoon"
+dependencies = ["nockchain/common/tx-engine", "nockchain/common/zeke", "nockchain/common/zoon", "nockchain/common/zose", "nockchain/common/wrapper", "nockchain/apps/bridge/types", "nockchain/apps/dumbnet/lib/types"]
+
+[[package]]
+name = "nockchain/apps/bridge/bridge"
+workspace = "nockchain"
+path = "apps/bridge"
+file = "bridge.hoon"
+dependencies = ["nockchain/common/tx-engine", "nockchain/apps/bridge/base", "nockchain/apps/bridge/nock", "nockchain/apps/wallet/lib/tx-builder", "nockchain/apps/wallet/lib/types", "nockchain/common/zeke", "nockchain/common/zoon", "nockchain/common/zose", "nockchain/common/wrapper", "nockchain/apps/bridge/types", "nockchain/apps/dumbnet/lib/types"]
+
+[[package]]
+name = "nockchain/apps/bridge/nock"
+workspace = "nockchain"
+path = "apps/bridge"
+file = "nock.hoon"
+dependencies = ["nockchain/common/tx-engine", "nockchain/common/zeke", "nockchain/common/zoon", "nockchain/common/zose", "nockchain/common/wrapper", "nockchain/apps/bridge/types", "nockchain/apps/dumbnet/lib/types"]
+
+[[package]]
+name = "nockchain/apps/bridge/types"
+workspace = "nockchain"
+path = "apps/bridge"
+file = "types.hoon"
+dependencies = ["nockchain/common/tx-engine", "nockchain/common/zeke", "nockchain/common/zoon", "nockchain/common/wrapper", "nockchain/apps/wallet/lib/types", "nockchain/apps/dumbnet/lib/types"]
+
 [[package]]
 name = "nockchain/apps/dumbnet/inner"
 workspace = "nockchain"
 path = "apps/dumbnet"
 file = "inner.hoon"
-dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/tx-engine", "nockchain/apps/dumbnet/lib/miner", "nockchain/apps/dumbnet/lib/derived", "nockchain/apps/dumbnet/lib/consensus", "nockchain/common/pow", "nockchain/common/nock-verifier", "nockchain/common/zeke", "nockchain/common/zoon", "nockchain/common/wrapper"]
+dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/tx-engine", "nockchain/apps/dumbnet/lib/miner", "nockchain/apps/dumbnet/lib/derived", "nockchain/apps/dumbnet/lib/consensus", "nockchain/common/pow", "nockchain/common/nock-verifier", "nockchain/common/zeke", "nockchain/common/h-zoon", "nockchain/common/wrapper"]
+
+[[package]]
+name = "nockchain/apps/dumbnet/lib/asert"
+workspace = "nockchain"
+path = "apps/dumbnet/lib"
+file = "asert.hoon"
+dependencies = ["nockchain/common/zeke"]
 
 [[package]]
 name = "nockchain/apps/dumbnet/lib/consensus"
 workspace = "nockchain"
 path = "apps/dumbnet/lib"
 file = "consensus.hoon"
-dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/pow", "nockchain/common/tx-engine", "nockchain/common/zoon"]
+dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/pow", "nockchain/common/tx-engine", "nockchain/apps/dumbnet/lib/asert", "nockchain/common/h-zoon"]
 
 [[package]]
 name = "nockchain/apps/dumbnet/lib/derived"
 workspace = "nockchain"
 path = "apps/dumbnet/lib"
 file = "derived.hoon"
-dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/tx-engine", "nockchain/common/zoon"]
+dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/tx-engine", "nockchain/common/h-zoon"]
 
 [[package]]
 name = "nockchain/apps/dumbnet/lib/miner"
 workspace = "nockchain"
 path = "apps/dumbnet/lib"
 file = "miner.hoon"
-dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/tx-engine", "nockchain/common/zoon"]
+dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/tx-engine", "nockchain/apps/dumbnet/lib/asert", "nockchain/common/h-zoon"]
 
 [[package]]
 name = "nockchain/apps/dumbnet/lib/types"
 workspace = "nockchain"
 path = "apps/dumbnet/lib"
 file = "types.hoon"
-dependencies = ["nockchain/common/zoon", "nockchain/common/zeke", "nockchain/common/wrapper", "nockchain/common/tx-engine", "nockchain/common/stark/prover", "nockchain/apps/dumbnet/miner"]
+dependencies = ["nockchain/common/h-zoon", "nockchain/common/zeke", "nockchain/common/wrapper", "nockchain/common/tx-engine", "nockchain/common/stark/prover", "nockchain/apps/dumbnet/miner"]
 
 [[package]]
 name = "nockchain/apps/dumbnet/miner"
@@ -260,7 +313,7 @@ name = "nockchain/apps/wallet/lib/tx-builder"
 workspace = "nockchain"
 path = "apps/wallet/lib"
 file = "tx-builder.hoon"
-dependencies = ["nockchain/common/tx-engine", "nockchain/apps/wallet/lib/utils", "nockchain/apps/wallet/lib/types", "nockchain/common/zoon"]
+dependencies = ["nockchain/common/tx-engine", "nockchain/apps/wallet/lib/utils", "nockchain/apps/wallet/lib/types", "nockchain/common/zoon", "nockchain/apps/bridge/types"]
 
 [[package]]
 name = "nockchain/apps/wallet/lib/types"
@@ -281,7 +334,7 @@ name = "nockchain/apps/wallet/wallet"
 workspace = "nockchain"
 path = "apps/wallet"
 file = "wallet.hoon"
-dependencies = ["nockchain/common/bip39", "nockchain/common/markdown/types", "nockchain/common/markdown/markdown", "nockchain/common/tx-engine", "nockchain/common/zeke", "nockchain/common/zoon", "nockchain/apps/dumbnet/lib/types", "nockchain/common/zose", "nockchain/common/wrapper", "nockchain/apps/wallet/lib/types", "nockchain/apps/wallet/lib/utils", "nockchain/apps/wallet/lib/tx-builder", "nockchain/apps/wallet/lib/s10"]
+dependencies = ["nockchain/common/bip39", "nockchain/common/markdown/types", "nockchain/common/markdown/markdown", "nockchain/common/tx-engine", "nockchain/common/zeke", "nockchain/common/zoon", "nockchain/common/h-zoon", "nockchain/apps/dumbnet/lib/types", "nockchain/apps/bridge/types", "nockchain/common/zose", "nockchain/common/wrapper", "nockchain/apps/wallet/lib/types", "nockchain/apps/wallet/lib/utils", "nockchain/apps/wallet/lib/tx-builder", "nockchain/apps/wallet/lib/s10"]
 
 [[package]]
 name = "nockchain/common/bip39"
@@ -296,6 +349,13 @@ workspace = "nockchain"
 path = "common"
 file = "bip39-english.hoon"
 dependencies = []
+
+[[package]]
+name = "nockchain/common/h-zoon"
+workspace = "nockchain"
+path = "common"
+file = "h-zoon.hoon"
+dependencies = ["nockchain/common/zoon"]
 
 [[package]]
 name = "nockchain/common/hoon"
@@ -379,7 +439,7 @@ name = "nockchain/common/tx-engine"
 workspace = "nockchain"
 path = "common"
 file = "tx-engine.hoon"
-dependencies = ["nockchain/common/tx-engine-0", "nockchain/common/tx-engine-1", "nockchain/common/zeke", "nockchain/common/zoon", "nockchain/common/zose"]
+dependencies = ["nockchain/common/tx-engine-0", "nockchain/common/tx-engine-1", "nockchain/common/zeke", "nockchain/common/h-zoon", "nockchain/common/zose"]
 
 [[package]]
 name = "nockchain/common/tx-engine-0"
@@ -393,7 +453,7 @@ name = "nockchain/common/tx-engine-1"
 workspace = "nockchain"
 path = "common"
 file = "tx-engine-1.hoon"
-dependencies = ["nockchain/common/tx-engine-0", "nockchain/common/zeke", "nockchain/common/zoon"]
+dependencies = ["nockchain/common/tx-engine-0", "nockchain/common/zeke", "nockchain/common/h-zoon"]
 
 [[package]]
 name = "nockchain/common/v0-v1/nock-common"
@@ -601,8 +661,73 @@ dependencies = ["nockchain/common/zeke"]
 [[package]]
 name = "nockchain/trivial"
 workspace = "nockchain"
-path = "hoon"
+path = ""
 file = "trivial.hoon"
+dependencies = []
+
+# urbit/numerics: math primitives, lagoon (linalg), saloon (decompositions)
+[[package]]
+name = "numerics/twoc"
+workspace = "numerics-math"
+path = "lib"
+file = "twoc.hoon"
+dependencies = []
+
+[[package]]
+name = "numerics/unum"
+workspace = "numerics-math"
+path = "lib"
+file = "unum.hoon"
+dependencies = ["numerics/twoc"]
+
+[[package]]
+name = "numerics/complex"
+workspace = "numerics-math"
+path = "lib"
+file = "complex.hoon"
+dependencies = []
+
+[[package]]
+name = "numerics/fixed"
+workspace = "numerics-math"
+path = "lib"
+file = "fixed.hoon"
+dependencies = ["numerics/twoc"]
+
+[[package]]
+name = "numerics/math"
+workspace = "numerics-math"
+path = "lib"
+file = "math.hoon"
+dependencies = []
+
+[[package]]
+name = "numerics/sur/lagoon"
+workspace = "numerics-lagoon"
+path = "sur"
+file = "lagoon.hoon"
+dependencies = []
+
+[[package]]
+name = "numerics/lagoon"
+workspace = "numerics-lagoon"
+path = "lib"
+file = "lagoon.hoon"
+dependencies = ["numerics/sur/lagoon", "numerics/twoc", "numerics/unum", "numerics/complex", "numerics/fixed"]
+
+[[package]]
+name = "numerics/saloon"
+workspace = "numerics-saloon"
+path = "lib"
+file = "saloon.hoon"
+dependencies = ["numerics/sur/lagoon", "numerics/lagoon", "numerics/math", "numerics/complex"]
+
+# jackfoxy/sequent: list operations
+[[package]]
+name = "sequent/seq"
+workspace = "sequent"
+path = "lib"
+file = "seq.hoon"
 dependencies = []
 
 # ============================================================================
@@ -642,6 +767,10 @@ name = "nockchain/zeke"
 target = "nockchain/common/zeke"
 
 [[alias]]
+name = "nockchain/h-zoon"
+target = "nockchain/common/h-zoon"
+
+[[alias]]
 name = "nockchain/zoon"
 target = "nockchain/common/zoon"
 
@@ -652,3 +781,15 @@ target = "nockchain/common/zose"
 [[alias]]
 name = "nockchain/wallet"
 target = "nockchain/apps/wallet/wallet"
+
+[[alias]]
+name = "lagoon"
+target = "numerics/lagoon"
+
+[[alias]]
+name = "saloon"
+target = "numerics/saloon"
+
+[[alias]]
+name = "sequent"
+target = "sequent/seq"
