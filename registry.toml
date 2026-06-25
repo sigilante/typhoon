@@ -56,6 +56,12 @@ ref = "ce5cb82"
 description = "Yard: curated community Hoon libraries (Urbit Foundation)"
 root_path = "desk"
 
+[workspace.nockapp-pack]
+git_url = "https://github.com/sigilante/nockapp-pack"
+ref = "a576cad44ad7b301f6a84ce10c11863217717a39"
+description = "NockApp Pack: example NockApps (sigilante/nockapp-pack)"
+root_path = "examples"
+
 # ============================================================================
 # Packages
 # ============================================================================
@@ -206,6 +212,105 @@ name = "urbit/tiny"
 workspace = "urbit"
 path = "lib"
 file = "tiny.hoon"
+dependencies = []
+
+# NockApp Pack (sigilante/nockapp-pack): example apps
+[[package]]
+name = "nockapp/chain-watch"
+workspace = "nockapp-pack"
+path = "chain-watch/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/nock-price"
+workspace = "nockapp-pack"
+path = "nock-price/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/balance-api"
+workspace = "nockapp-pack"
+path = "balance-api/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/token-price"
+workspace = "nockapp-pack"
+path = "token-price/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/http-counter"
+workspace = "nockapp-pack"
+path = "http-counter/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/http-static"
+workspace = "nockapp-pack"
+path = "http-static/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/echo-grpc"
+workspace = "nockapp-pack"
+path = "echo-grpc/hoon/app"
+file = "listen.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/hello-basic"
+workspace = "nockapp-pack"
+path = "hello-basic/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/minesweeper"
+workspace = "nockapp-pack"
+path = "minesweeper/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/common-blog"
+workspace = "nockapp-pack"
+path = "common-blog/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/wordle"
+workspace = "nockapp-pack"
+path = "wordle/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/conway"
+workspace = "nockapp-pack"
+path = "conway/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/solitaire"
+workspace = "nockapp-pack"
+path = "solitaire/hoon/app"
+file = "app.hoon"
+dependencies = []
+
+[[package]]
+name = "nockapp/gematria"
+workspace = "nockapp-pack"
+path = "gematria/hoon/app"
+file = "app.hoon"
 dependencies = []
 
 # Nockchain standard library (nockchain/nockchain, hoon/)

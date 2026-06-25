@@ -95,6 +95,12 @@ WORKSPACES = {
         "description": "Yard: curated community Hoon libraries (Urbit Foundation)",
         "root_path": "desk",
     },
+    "nockapp-pack": {
+        "git_url": "https://github.com/sigilante/nockapp-pack",
+        "ref": "a576cad44ad7b301f6a84ce10c11863217717a39",
+        "description": "NockApp Pack: example NockApps (sigilante/nockapp-pack)",
+        "root_path": "examples",
+    },
 }
 
 # Curated urbit packages (name, path, file, dependencies) -- not import-derived.
@@ -120,6 +126,24 @@ URBIT_PACKAGES = [
     ("urbit/mapset", "lib", "mapset.hoon", ["urbit/map"]),
     ("urbit/set", "lib", "set.hoon", []),
     ("urbit/tiny", "lib", "tiny.hoon", []),
+]
+
+# NockApp Pack example apps (explicit; self-contained, so no cross-workspace deps).
+NOCKAPP_PACKAGES = [
+    ("nockapp/chain-watch",  "chain-watch/hoon/app",  "app.hoon",    []),
+    ("nockapp/nock-price",   "nock-price/hoon/app",   "app.hoon",    []),
+    ("nockapp/balance-api",  "balance-api/hoon/app",  "app.hoon",    []),
+    ("nockapp/token-price",  "token-price/hoon/app",  "app.hoon",    []),
+    ("nockapp/http-counter", "http-counter/hoon/app", "app.hoon",    []),
+    ("nockapp/http-static",  "http-static/hoon/app",  "app.hoon",    []),
+    ("nockapp/echo-grpc",    "echo-grpc/hoon/app",    "listen.hoon", []),
+    ("nockapp/hello-basic",  "hello-basic/hoon/app",  "app.hoon",    []),
+    ("nockapp/minesweeper",  "minesweeper/hoon/app",  "app.hoon",    []),
+    ("nockapp/common-blog",  "common-blog/hoon/app",  "app.hoon",    []),
+    ("nockapp/wordle",       "wordle/hoon/app",       "app.hoon",    []),
+    ("nockapp/conway",       "conway/hoon/app",       "app.hoon",    []),
+    ("nockapp/solitaire",    "solitaire/hoon/app",    "app.hoon",    []),
+    ("nockapp/gematria",     "gematria/hoon/app",     "app.hoon",    []),
 ]
 
 # Derived families: import headers are parsed to compute dependencies.
@@ -426,6 +450,10 @@ def generate(overrides):
     for name, path, file, deps in URBIT_PACKAGES:
         packages.append({"name": name, "workspace": "urbit", "path": path,
                          "file": file, "dependencies": deps, "_resolver": "explicit"})
+    # nockapp pack (explicit)
+    for name, path, file, deps in NOCKAPP_PACKAGES:
+        packages.append({"name": name, "workspace": "nockapp-pack", "path": path,
+                         "file": file, "dependencies": deps, "_resolver": "explicit"})
     # derived families
     derived = []
     for fam in FLAT_FAMILIES:
@@ -474,6 +502,7 @@ def emit(packages):
         "numerics": "# urbit/numerics: math primitives, lagoon (linalg), saloon (decompositions)",
         "sequent": "# jackfoxy/sequent: list operations",
         "yard": "# urbit/yard: curated general-purpose libraries (Urbit Foundation)",
+        "nockapp": "# NockApp Pack (sigilante/nockapp-pack): example apps",
     }
     last_ws_group = None
     for p in packages:
