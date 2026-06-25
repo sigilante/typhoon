@@ -97,7 +97,7 @@ WORKSPACES = {
     },
     "nockapp-pack": {
         "git_url": "https://github.com/sigilante/nockapp-pack",
-        "ref": "a576cad44ad7b301f6a84ce10c11863217717a39",
+        "ref": "c1b7e566baf5ebf3506ec1aa11b9a50f9c286b5c",
         "description": "NockApp Pack: example NockApps (sigilante/nockapp-pack)",
         "root_path": "examples",
     },
