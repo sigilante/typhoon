@@ -62,6 +62,12 @@ ref = "c1b7e566baf5ebf3506ec1aa11b9a50f9c286b5c"
 description = "NockApp Pack: example NockApps (sigilante/nockapp-pack)"
 root_path = "examples"
 
+[workspace.nockasm]
+git_url = "https://github.com/sigilante/nockasm"
+ref = "50e9e72"
+description = "Nockasm: legible Nock assembly (expander, target IR, jam lifter)"
+root_path = "desk"
+
 # ============================================================================
 # Packages
 # ============================================================================
@@ -898,6 +904,14 @@ path = "lib"
 file = "cram.hoon"
 dependencies = []
 
+# Nockasm (sigilante/nockasm, desk): Nock assembly expander + target IR
+[[package]]
+name = "sigilante/nockasm"
+workspace = "nockasm"
+path = "lib"
+file = "nockasm.hoon"
+dependencies = []
+
 # ============================================================================
 # Aliases
 # ============================================================================
@@ -961,3 +975,7 @@ target = "numerics/saloon"
 [[alias]]
 name = "sequent"
 target = "sequent/seq"
+
+[[alias]]
+name = "nockasm"
+target = "sigilante/nockasm"
