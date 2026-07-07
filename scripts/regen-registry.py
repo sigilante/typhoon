@@ -101,6 +101,12 @@ WORKSPACES = {
         "description": "NockApp Pack: example NockApps (sigilante/nockapp-pack)",
         "root_path": "examples",
     },
+    "nockasm": {
+        "git_url": "https://github.com/sigilante/nockasm",
+        "ref": "50e9e72",
+        "description": "Nockasm: legible Nock assembly (expander, target IR, jam lifter)",
+        "root_path": "desk",
+    },
 }
 
 # Curated urbit packages (name, path, file, dependencies) -- not import-derived.
@@ -198,6 +204,16 @@ FORD_FAMILIES = [
                        "number-to-words", "math", "etch", "cram"]},
         ],
     },
+    {
+        # Nockasm: single stdlib-only library from the nockasm desk (the desk
+        # also carries mar/ and tests/, which are not packages).
+        "family": "nockasm",
+        "checkout": "nockasm",
+        "name_prefix": "sigilante",
+        "specs": [
+            {"workspace": "nockasm", "subdir": "lib", "stems": ["nockasm"]},
+        ],
+    },
 ]
 
 # Default checkout locations (override with --checkout family=/path).
@@ -206,6 +222,7 @@ CHECKOUTS = {
     "numerics": "/tmp/numerics",
     "sequent": "/tmp/sequent-repo",
     "yard": "/tmp/yard",
+    "nockasm": "/tmp/nockasm",
 }
 
 ALIASES = [
@@ -224,6 +241,7 @@ ALIASES = [
     ("lagoon", "numerics/lagoon"),
     ("saloon", "numerics/saloon"),
     ("sequent", "sequent/seq"),
+    ("nockasm", "sigilante/nockasm"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -503,6 +521,7 @@ def emit(packages):
         "sequent": "# jackfoxy/sequent: list operations",
         "yard": "# urbit/yard: curated general-purpose libraries (Urbit Foundation)",
         "nockapp": "# NockApp Pack (sigilante/nockapp-pack): example apps",
+        "nockasm": "# Nockasm (sigilante/nockasm, desk): Nock assembly expander + target IR",
     }
     last_ws_group = None
     for p in packages:
