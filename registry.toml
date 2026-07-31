@@ -64,7 +64,7 @@ root_path = "examples"
 
 [workspace.nockasm]
 git_url = "https://github.com/sigilante/nockasm"
-ref = "50e9e72"
+ref = "f5efcea"
 description = "Nockasm: legible Nock assembly (expander, target IR, jam lifter)"
 root_path = "desk"
 
@@ -906,11 +906,18 @@ dependencies = []
 
 # Nockasm (sigilante/nockasm, desk): Nock assembly expander + target IR
 [[package]]
+name = "sigilante/sur/nockasm"
+workspace = "nockasm"
+path = "sur"
+file = "nockasm.hoon"
+dependencies = []
+
+[[package]]
 name = "sigilante/nockasm"
 workspace = "nockasm"
 path = "lib"
 file = "nockasm.hoon"
-dependencies = []
+dependencies = ["sigilante/sur/nockasm"]
 
 # ============================================================================
 # Aliases

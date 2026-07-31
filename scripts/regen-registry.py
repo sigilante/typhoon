@@ -103,7 +103,7 @@ WORKSPACES = {
     },
     "nockasm": {
         "git_url": "https://github.com/sigilante/nockasm",
-        "ref": "50e9e72",
+        "ref": "f5efcea",
         "description": "Nockasm: legible Nock assembly (expander, target IR, jam lifter)",
         "root_path": "desk",
     },
@@ -205,12 +205,16 @@ FORD_FAMILIES = [
         ],
     },
     {
-        # Nockasm: single stdlib-only library from the nockasm desk (the desk
-        # also carries mar/ and tests/, which are not packages).
+        # Nockasm: the shared IR types (sur, stdlib-only) and the reference
+        # implementation over them (lib, imports the sur) from the nockasm
+        # desk (the desk also carries mar/ and tests/, which are not
+        # packages). As of IR v2 the lib's `/- *nockasm` derives its
+        # dependency on the sur package mechanically.
         "family": "nockasm",
         "checkout": "nockasm",
         "name_prefix": "sigilante",
         "specs": [
+            {"workspace": "nockasm", "subdir": "sur", "stems": ["nockasm"]},
             {"workspace": "nockasm", "subdir": "lib", "stems": ["nockasm"]},
         ],
     },
