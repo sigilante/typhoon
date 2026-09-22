@@ -19,10 +19,13 @@ Usage:
     regen-registry.py generate [--output registry.toml]
     regen-registry.py generate --check        # diff vs existing, non-zero if drift
     regen-registry.py validate [registry.toml] # resolvability + file existence
+    regen-registry.py outdated [--markdown] [--exit-code]  # pins vs upstream (exit 10 if stale)
 
 Checkouts for the derived families default to the paths in CHECKOUTS below and
-can be overridden with `--checkout family=/path` (repeatable). If a checkout is
-missing it is shallow-cloned at the configured ref into a temp cache.
+can be overridden with `--checkout family=/path` (repeatable) and must already
+be at the pinned ref. If a checkout is missing it is cloned into a temp cache
+and kept at the configured ref. Explicit workspaces are file-checked by
+`validate` via a tree-only fetch (no blobs, no history).
 
 Python 3.11+ (uses tomllib). Standard library only.
 """
@@ -55,33 +58,39 @@ DEFAULT_REF = "latest"
 WORKSPACES = {
     "urbit": {
         "git_url": "https://github.com/urbit/urbit",
-        "ref": "409k",
+        "ref": "408k-2",
         "description": "Urbit OS",
         "root_path": "pkg/arvo",
     },
     "nockchain": {
         "git_url": "https://github.com/nockchain/nockchain",
-        "ref": "6d29078",
+        "ref": "6ccb9e8",
         "description": "Nockchain standard library",
         "root_path": "hoon",
     },
     "numerics-math": {
         "git_url": "https://github.com/urbit/numerics",
-        "ref": "043a437",
+        "ref": "047df07",
         "description": "Numerics: shared math primitives (libmath desk)",
         "root_path": "libmath/desk",
     },
     "numerics-lagoon": {
         "git_url": "https://github.com/urbit/numerics",
-        "ref": "043a437",
+        "ref": "047df07",
         "description": "Lagoon: vector/matrix linear algebra (lagoon desk)",
         "root_path": "lagoon/desk",
     },
     "numerics-saloon": {
         "git_url": "https://github.com/urbit/numerics",
-        "ref": "043a437",
+        "ref": "047df07",
         "description": "Saloon: eigen/decomposition routines (saloon desk)",
         "root_path": "saloon/desk",
+    },
+    "numerics-rand": {
+        "git_url": "https://github.com/urbit/numerics",
+        "ref": "047df07",
+        "description": "Numerics: random number generation over the math primitives (librand desk)",
+        "root_path": "librand/desk",
     },
     "sequent": {
         "git_url": "https://github.com/jackfoxy/sequent",
@@ -91,7 +100,7 @@ WORKSPACES = {
     },
     "yard": {
         "git_url": "https://github.com/urbit/yard",
-        "ref": "ce5cb82",
+        "ref": "6b6f1c7",
         "description": "Yard: curated community Hoon libraries (Urbit Foundation)",
         "root_path": "desk",
     },
@@ -103,10 +112,19 @@ WORKSPACES = {
     },
     "nockasm": {
         "git_url": "https://github.com/sigilante/nockasm",
-        "ref": "f5efcea",
+        "ref": "dc83c20",
         "description": "Nockasm: legible Nock assembly (expander, target IR, jam lifter)",
         "root_path": "desk",
     },
+}
+
+# How `outdated` decides what "latest upstream" means for each workspace:
+#   "branch"  -- head of the repo's default branch (the default)
+#   "kelvin"  -- newest urbit kelvin release tag (e.g. 408k-2); kelvins count
+#                *down*, so the lowest non-rc kelvin with the highest patch wins
+#   "hold"    -- deliberately frozen; reported but never flagged
+UPSTREAM_TRACKING = {
+    "urbit": "kelvin",
 }
 
 # Curated urbit packages (name, path, file, dependencies) -- not import-derived.
@@ -115,16 +133,16 @@ URBIT_PACKAGES = [
     ("urbit/lull", "sys", "lull.hoon", ["urbit/hoon"]),
     ("urbit/zuse", "sys", "zuse.hoon", ["urbit/lull"]),
     ("urbit/arvo", "sys", "arvo.hoon", ["urbit/lull", "urbit/zuse"]),
-    ("urbit/ames", "sys/vanes", "ames.hoon", ["urbit/arvo"]),
-    ("urbit/behn", "sys/vanes", "behn.hoon", ["urbit/arvo"]),
-    ("urbit/clay", "sys/vanes", "clay.hoon", ["urbit/arvo"]),
-    ("urbit/dill", "sys/vanes", "dill.hoon", ["urbit/arvo"]),
-    ("urbit/eyre", "sys/vanes", "eyre.hoon", ["urbit/arvo"]),
-    ("urbit/gall", "sys/vanes", "gall.hoon", ["urbit/arvo"]),
-    ("urbit/iris", "sys/vanes", "iris.hoon", ["urbit/arvo"]),
-    ("urbit/jael", "sys/vanes", "jael.hoon", ["urbit/arvo"]),
-    ("urbit/khan", "sys/vanes", "khan.hoon", ["urbit/arvo"]),
-    ("urbit/lick", "sys/vanes", "lick.hoon", ["urbit/arvo"]),
+    ("urbit/ames", "sys/vane", "ames.hoon", ["urbit/arvo"]),
+    ("urbit/behn", "sys/vane", "behn.hoon", ["urbit/arvo"]),
+    ("urbit/clay", "sys/vane", "clay.hoon", ["urbit/arvo"]),
+    ("urbit/dill", "sys/vane", "dill.hoon", ["urbit/arvo"]),
+    ("urbit/eyre", "sys/vane", "eyre.hoon", ["urbit/arvo"]),
+    ("urbit/gall", "sys/vane", "gall.hoon", ["urbit/arvo"]),
+    ("urbit/iris", "sys/vane", "iris.hoon", ["urbit/arvo"]),
+    ("urbit/jael", "sys/vane", "jael.hoon", ["urbit/arvo"]),
+    ("urbit/khan", "sys/vane", "khan.hoon", ["urbit/arvo"]),
+    ("urbit/lick", "sys/vane", "lick.hoon", ["urbit/arvo"]),
     ("urbit/bits", "lib", "bits.hoon", []),
     ("urbit/list", "lib", "list.hoon", []),
     ("urbit/map", "lib", "map.hoon", []),
@@ -166,7 +184,7 @@ FLAT_FAMILIES = [
         "checkout": "nockchain",          # CHECKOUTS key
         "workspace": "nockchain",
         "name_prefix": "nockchain",
-        "exclude_dirs": ["tests", "jams", "test-jams", "scripts", "apps/roswell"],
+        "exclude_dirs": ["tests", "jams", "test-jams", "scripts", "probes", "apps/roswell"],
         "exclude_suffix": ["-test.hoon"],
     },
 ]
@@ -181,6 +199,9 @@ FORD_FAMILIES = [
             {"workspace": "numerics-lagoon", "subdir": "sur", "stems": ["lagoon"]},
             {"workspace": "numerics-lagoon", "subdir": "lib", "stems": ["lagoon"]},
             {"workspace": "numerics-saloon", "subdir": "lib", "stems": ["saloon"]},
+            {"workspace": "numerics-rand", "subdir": "sur", "stems": ["rand"]},
+            {"workspace": "numerics-rand", "subdir": "lib",
+             "stems": ["rand", "i754rand", "twocrand", "unumrand", "complexrand", "fixedrand"]},
         ],
     },
     {
@@ -255,24 +276,59 @@ ALIASES = [
 _CLONE_CACHE = os.path.join(tempfile.gettempdir(), "typhoon-regen-checkouts")
 
 
+def _rev(path, ref):
+    r = subprocess.run(["git", "-C", path, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"],
+                       capture_output=True, text=True)
+    return r.stdout.strip() or None
+
+
 def get_checkout(key, overrides):
-    """Return a local path for the checkout `key`, cloning if necessary."""
-    path = overrides.get(key) or CHECKOUTS.get(key)
-    if path and os.path.isdir(path):
-        return path
-    # Clone shallow at the configured ref of the first workspace that uses it.
+    """Return a local path for the checkout `key` at its pinned ref, cloning if necessary.
+
+    A user-supplied checkout (--checkout or CHECKOUTS) must already be at the
+    pinned ref -- we never move someone's working tree, but we refuse to derive
+    the registry from the wrong commit. The clone cache is ours, so it is
+    fetched and moved to the pinned ref as needed.
+    """
     ws = next((w for fam in FLAT_FAMILIES + FORD_FAMILIES
                if fam["checkout"] == key
                for w in [WORKSPACES[fam.get("workspace", fam.get("specs", [{}])[0].get("workspace"))]]), None)
     if ws is None:
         raise SystemExit(f"no workspace found for checkout '{key}'")
+    path = overrides.get(key) or CHECKOUTS.get(key)
+    if path and os.path.isdir(path):
+        want, head = _rev(path, ws["ref"]), _rev(path, "HEAD")
+        if want is None or want != head:
+            raise SystemExit(f"checkout '{key}' at {path} is at {head and head[:7]}, not the pinned "
+                             f"ref {ws['ref']}; check out {ws['ref']} there (or remove it to clone)")
+        return path
     os.makedirs(_CLONE_CACHE, exist_ok=True)
     dest = os.path.join(_CLONE_CACHE, key)
     if not os.path.isdir(dest):
         print(f"cloning {ws['git_url']} -> {dest}", file=sys.stderr)
         subprocess.run(["git", "clone", "--filter=blob:none", ws["git_url"], dest], check=True)
-        subprocess.run(["git", "-C", dest, "checkout", ws["ref"]], check=True)
+    if _rev(dest, ws["ref"]) is None:
+        subprocess.run(["git", "-C", dest, "fetch", "--tags", "origin"], check=True)
+    if _rev(dest, ws["ref"]) != _rev(dest, "HEAD"):
+        subprocess.run(["git", "-C", dest, "checkout", "--quiet", ws["ref"]], check=True)
     return dest
+
+def remote_tree(wsname):
+    """Set of file paths (relative to root_path) in `wsname` at its pinned ref.
+
+    For the explicit (curated, never-parsed) workspaces: fetches only the
+    commit's trees -- no blobs, no history -- so it is cheap even for urbit.
+    """
+    ws = WORKSPACES[wsname]
+    dest = os.path.join(_CLONE_CACHE, f"{wsname}-tree")
+    if not os.path.isdir(dest):
+        os.makedirs(dest)
+        subprocess.run(["git", "-C", dest, "init", "--quiet"], check=True)
+    subprocess.run(["git", "-C", dest, "fetch", "--quiet", "--depth", "1", "--filter=blob:none",
+                    ws["git_url"], ws["ref"]], check=True)
+    out = subprocess.run(["git", "-C", dest, "ls-tree", "-r", "--name-only", "FETCH_HEAD",
+                          "--", ws["root_path"]], capture_output=True, text=True, check=True).stdout
+    return {os.path.relpath(line, ws["root_path"]) for line in out.splitlines()}
 
 # ---------------------------------------------------------------------------
 # Import parsing
@@ -521,7 +577,7 @@ def emit(packages):
     group_comments = {
         "urbit": "# Urbit (urbit/urbit, pkg/arvo): /sys stdlib, vanes, /lib",
         "nockchain": "# Nockchain standard library (nockchain/nockchain, hoon/)",
-        "numerics": "# urbit/numerics: math primitives, lagoon (linalg), saloon (decompositions)",
+        "numerics": "# urbit/numerics: math primitives, lagoon (linalg), saloon (decompositions), rand",
         "sequent": "# jackfoxy/sequent: list operations",
         "yard": "# urbit/yard: curated general-purpose libraries (Urbit Foundation)",
         "nockapp": "# NockApp Pack (sigilante/nockapp-pack): example apps",
@@ -576,10 +632,23 @@ def validate(path, overrides):
         for spec in fam["specs"]:
             checkout_for_ws[spec["workspace"]] = fam["checkout"]
     checked = skipped = 0
+    bases = {}
+    trees = {}
     for p in pkgs:
         key = checkout_for_ws.get(p["workspace"])
-        base = overrides.get(key) or CHECKOUTS.get(key) if key else None
-        if not base or not os.path.isdir(base):
+        if key is None and p["workspace"] in WORKSPACES:     # explicit workspace
+            if p["workspace"] not in trees:
+                trees[p["workspace"]] = remote_tree(p["workspace"])
+            rel = os.path.join(p["path"], p["file"])
+            if rel not in trees[p["workspace"]]:
+                errors.append(f"missing file: {p['name']} -> {p['workspace']}:{rel}")
+            else:
+                checked += 1
+            continue
+        if key and key not in bases:
+            bases[key] = get_checkout(key, overrides)
+        base = bases.get(key)
+        if not base:
             skipped += 1
             continue
         fp = os.path.join(base, ws[p["workspace"]]["root_path"], p["path"], p["file"])
@@ -597,6 +666,67 @@ def validate(path, overrides):
         return 1
     print("OK: all dependencies and aliases resolve; all checked files exist.")
     return 0
+
+# ---------------------------------------------------------------------------
+# Upstream drift check
+# ---------------------------------------------------------------------------
+
+_KELVIN_RE = re.compile(r"^(\d+)k(?:-(\d+))?$")
+
+
+def _ls_remote(url, *patterns, opts=()):
+    out = subprocess.run(["git", "ls-remote", *opts, url, *patterns],
+                         capture_output=True, text=True, check=True).stdout
+    return [line.split("\t", 1) for line in out.splitlines() if "\t" in line]
+
+
+def _latest_upstream(ws, mode):
+    """(latest_ref, latest_sha, pinned_sha_or_None) for a workspace."""
+    url, ref = ws["git_url"], ws["ref"]
+    if mode == "kelvin":
+        tags = {}
+        for sha, name in _ls_remote(url, opts=["--tags"]):
+            name = name.removeprefix("refs/tags/")
+            peeled = name.endswith("^{}")
+            name = name.removesuffix("^{}")
+            if peeled or name not in tags:        # prefer the peeled commit sha
+                tags[name] = sha
+        kelvins = [(int(m[1]), -int(m[2] or 0), t) for t in tags
+                   if (m := _KELVIN_RE.match(t))]
+        _, _, latest = min(kelvins)
+        return latest, tags[latest], tags.get(ref)
+    (sha, _), = _ls_remote(url, "HEAD")
+    return sha[:7], sha, None
+
+
+def outdated(markdown=False):
+    """Report workspaces whose pinned ref lags upstream. Returns the stale names."""
+    rows, stale, seen = [], [], {}
+    for name, ws in WORKSPACES.items():
+        mode = UPSTREAM_TRACKING.get(name, "branch")
+        key = (ws["git_url"], ws["ref"], mode)
+        if key not in seen:                        # numerics-* share one repo/ref
+            seen[key] = _latest_upstream(ws, "branch" if mode == "hold" else mode)
+        latest, latest_sha, pinned_sha = seen[key]
+        pinned = ws["ref"]
+        current = (pinned == latest if mode == "kelvin"
+                   else latest_sha.startswith(pinned) or pinned_sha == latest_sha)
+        status = "current" if current else ("held" if mode == "hold" else "OUTDATED")
+        if status == "OUTDATED":
+            stale.append(name)
+        compare = f"{ws['git_url']}/compare/{pinned}...{latest}" if not current else ""
+        rows.append((name, mode, pinned, latest, status, compare))
+    if markdown:
+        print("| Workspace | Tracks | Pinned | Latest | Status |")
+        print("| --- | --- | --- | --- | --- |")
+        for name, mode, pinned, latest, status, compare in rows:
+            st = f"[**{status}**]({compare})" if compare else status
+            print(f"| `{name}` | {mode} | `{pinned}` | `{latest}` | {st} |")
+    else:
+        for name, mode, pinned, latest, status, compare in rows:
+            print(f"{status:9} {name:16} {mode:7} pinned={pinned:12} latest={latest:12} {compare}")
+    return stale
+
 
 # ---------------------------------------------------------------------------
 # CLI
@@ -628,6 +758,11 @@ def main(argv=None):
     v.add_argument("path", nargs="?", default=REGISTRY_PATH)
     v.add_argument("--checkout", action="append", metavar="family=/path")
 
+    o = sub.add_parser("outdated", help="report workspaces whose pinned ref lags upstream")
+    o.add_argument("--markdown", action="store_true", help="emit a Markdown table")
+    o.add_argument("--exit-code", action="store_true",
+                   help="exit 10 if any workspace is outdated")
+
     args = ap.parse_args(argv)
     overrides = parse_overrides(getattr(args, "checkout", None))
 
@@ -646,6 +781,10 @@ def main(argv=None):
 
     if args.cmd == "validate":
         return validate(args.path, overrides)
+
+    if args.cmd == "outdated":
+        stale = outdated(markdown=args.markdown)
+        return 10 if (stale and args.exit_code) else 0
 
 
 def _semantic(d):

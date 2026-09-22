@@ -1,0 +1,77 @@
+name: upstream-check
+
+# Weekly drift check: compares every pinned workspace ref in
+# scripts/regen-registry.py against its upstream (default-branch head, or the
+# newest kelvin release for urbit) and keeps a single tracking issue, labelled
+# `upstream-drift`, in sync with the result. Bumping is still a human step --
+# see "Upgrade runbook" in CONTRIBUTING.md -- because new upstream imports need
+# a deliberate include/skip decision.
+
+on:
+  schedule:
+    - cron: "17 14 * * 1"   # Mondays 14:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  outdated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compare pins against upstream
+        id: check
+        run: |
+          set +e
+          python3 scripts/regen-registry.py outdated --markdown --exit-code > report.md
+          code=$?
+          set -e
+          cat report.md
+          case $code in
+            0) echo "stale=false" >> "$GITHUB_OUTPUT" ;;
+            10) echo "stale=true" >> "$GITHUB_OUTPUT" ;;
+            *) exit $code ;;
+          esac
+
+      # The live registry should also still hold together at its current pins
+      # (catches upstream force-pushes or deleted tags under a pinned ref).
+      - name: Validate registry at current pins
+        run: python3 scripts/regen-registry.py validate
+
+      - name: Update tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STALE: ${{ steps.check.outputs.stale }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create upstream-drift --color FBCA04 \
+            --description "Pinned upstream ref lags upstream" --force
+          issue=$(gh issue list --label upstream-drift --state open --json number --jq '.[0].number // empty')
+          if [ "$STALE" = "true" ]; then
+            {
+              echo "One or more pinned upstreams have moved. Checked $(date -u +%Y-%m-%d) ([run]($RUN_URL))."
+              echo
+              cat report.md
+              echo
+              echo "To bump: edit \`ref\` in \`WORKSPACES\` (\`scripts/regen-registry.py\`), then"
+              echo "\`generate\` → \`generate --check\` → \`validate\`, and read any"
+              echo "\`… unresolved\` / \`not a package\` warnings. See CONTRIBUTING.md → Upgrade runbook."
+              echo
+              echo "_This issue is maintained by the upstream-check workflow and closes itself once every pin is current._"
+            } > body.md
+            if [ -n "$issue" ]; then
+              gh issue edit "$issue" --body-file body.md
+            else
+              gh issue create --title "Upstream drift: pinned workspaces are behind" \
+                --label upstream-drift --body-file body.md
+            fi
+          elif [ -n "$issue" ]; then
+            gh issue close "$issue" --comment "All pinned upstreams are current as of $(date -u +%Y-%m-%d) ([run]($RUN_URL))."
+          fi

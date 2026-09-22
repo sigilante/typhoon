@@ -16,33 +16,39 @@ default_ref = "latest"
 
 [workspace.urbit]
 git_url = "https://github.com/urbit/urbit"
-ref = "409k"
+ref = "408k-2"
 description = "Urbit OS"
 root_path = "pkg/arvo"
 
 [workspace.nockchain]
 git_url = "https://github.com/nockchain/nockchain"
-ref = "6d29078"
+ref = "6ccb9e8"
 description = "Nockchain standard library"
 root_path = "hoon"
 
 [workspace.numerics-math]
 git_url = "https://github.com/urbit/numerics"
-ref = "043a437"
+ref = "047df07"
 description = "Numerics: shared math primitives (libmath desk)"
 root_path = "libmath/desk"
 
 [workspace.numerics-lagoon]
 git_url = "https://github.com/urbit/numerics"
-ref = "043a437"
+ref = "047df07"
 description = "Lagoon: vector/matrix linear algebra (lagoon desk)"
 root_path = "lagoon/desk"
 
 [workspace.numerics-saloon]
 git_url = "https://github.com/urbit/numerics"
-ref = "043a437"
+ref = "047df07"
 description = "Saloon: eigen/decomposition routines (saloon desk)"
 root_path = "saloon/desk"
+
+[workspace.numerics-rand]
+git_url = "https://github.com/urbit/numerics"
+ref = "047df07"
+description = "Numerics: random number generation over the math primitives (librand desk)"
+root_path = "librand/desk"
 
 [workspace.sequent]
 git_url = "https://github.com/jackfoxy/sequent"
@@ -52,7 +58,7 @@ root_path = "desk"
 
 [workspace.yard]
 git_url = "https://github.com/urbit/yard"
-ref = "ce5cb82"
+ref = "6b6f1c7"
 description = "Yard: curated community Hoon libraries (Urbit Foundation)"
 root_path = "desk"
 
@@ -64,7 +70,7 @@ root_path = "examples"
 
 [workspace.nockasm]
 git_url = "https://github.com/sigilante/nockasm"
-ref = "f5efcea"
+ref = "dc83c20"
 description = "Nockasm: legible Nock assembly (expander, target IR, jam lifter)"
 root_path = "desk"
 
@@ -104,70 +110,70 @@ dependencies = ["urbit/lull", "urbit/zuse"]
 [[package]]
 name = "urbit/ames"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "ames.hoon"
 dependencies = ["urbit/arvo"]
 
 [[package]]
 name = "urbit/behn"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "behn.hoon"
 dependencies = ["urbit/arvo"]
 
 [[package]]
 name = "urbit/clay"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "clay.hoon"
 dependencies = ["urbit/arvo"]
 
 [[package]]
 name = "urbit/dill"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "dill.hoon"
 dependencies = ["urbit/arvo"]
 
 [[package]]
 name = "urbit/eyre"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "eyre.hoon"
 dependencies = ["urbit/arvo"]
 
 [[package]]
 name = "urbit/gall"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "gall.hoon"
 dependencies = ["urbit/arvo"]
 
 [[package]]
 name = "urbit/iris"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "iris.hoon"
 dependencies = ["urbit/arvo"]
 
 [[package]]
 name = "urbit/jael"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "jael.hoon"
 dependencies = ["urbit/arvo"]
 
 [[package]]
 name = "urbit/khan"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "khan.hoon"
 dependencies = ["urbit/arvo"]
 
 [[package]]
 name = "urbit/lick"
 workspace = "urbit"
-path = "sys/vanes"
+path = "sys/vane"
 file = "lick.hoon"
 dependencies = ["urbit/arvo"]
 
@@ -381,7 +387,7 @@ name = "nockchain/apps/dumbnet/lib/miner"
 workspace = "nockchain"
 path = "apps/dumbnet/lib"
 file = "miner.hoon"
-dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/tx-engine", "nockchain/apps/dumbnet/lib/asert", "nockchain/common/h-zoon"]
+dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/tx-engine", "nockchain/apps/dumbnet/lib/consensus", "nockchain/apps/dumbnet/lib/asert", "nockchain/common/h-zoon"]
 
 [[package]]
 name = "nockchain/apps/dumbnet/lib/types"
@@ -403,6 +409,13 @@ workspace = "nockchain"
 path = "apps/dumbnet"
 file = "outer.hoon"
 dependencies = ["nockchain/apps/dumbnet/inner"]
+
+[[package]]
+name = "nockchain/apps/hoon-compiler/mint"
+workspace = "nockchain"
+path = "apps/hoon-compiler"
+file = "mint.hoon"
+dependencies = []
 
 [[package]]
 name = "nockchain/apps/hoonc/hoonc"
@@ -782,7 +795,7 @@ path = ""
 file = "trivial.hoon"
 dependencies = []
 
-# urbit/numerics: math primitives, lagoon (linalg), saloon (decompositions)
+# urbit/numerics: math primitives, lagoon (linalg), saloon (decompositions), rand
 [[package]]
 name = "numerics/twoc"
 workspace = "numerics-math"
@@ -837,7 +850,56 @@ name = "numerics/saloon"
 workspace = "numerics-saloon"
 path = "lib"
 file = "saloon.hoon"
-dependencies = ["numerics/sur/lagoon", "numerics/lagoon", "numerics/math", "numerics/complex"]
+dependencies = ["numerics/sur/lagoon", "numerics/lagoon", "numerics/math", "numerics/complex", "numerics/rand", "numerics/i754rand"]
+
+[[package]]
+name = "numerics/sur/rand"
+workspace = "numerics-rand"
+path = "sur"
+file = "rand.hoon"
+dependencies = []
+
+[[package]]
+name = "numerics/rand"
+workspace = "numerics-rand"
+path = "lib"
+file = "rand.hoon"
+dependencies = ["numerics/sur/rand", "numerics/math"]
+
+[[package]]
+name = "numerics/i754rand"
+workspace = "numerics-rand"
+path = "lib"
+file = "i754rand.hoon"
+dependencies = ["numerics/rand", "numerics/math"]
+
+[[package]]
+name = "numerics/twocrand"
+workspace = "numerics-rand"
+path = "lib"
+file = "twocrand.hoon"
+dependencies = ["numerics/rand", "numerics/twoc"]
+
+[[package]]
+name = "numerics/unumrand"
+workspace = "numerics-rand"
+path = "lib"
+file = "unumrand.hoon"
+dependencies = ["numerics/rand", "numerics/unum"]
+
+[[package]]
+name = "numerics/complexrand"
+workspace = "numerics-rand"
+path = "lib"
+file = "complexrand.hoon"
+dependencies = ["numerics/rand", "numerics/i754rand", "numerics/complex", "numerics/math"]
+
+[[package]]
+name = "numerics/fixedrand"
+workspace = "numerics-rand"
+path = "lib"
+file = "fixedrand.hoon"
+dependencies = ["numerics/rand", "numerics/twocrand", "numerics/fixed"]
 
 # jackfoxy/sequent: list operations
 [[package]]

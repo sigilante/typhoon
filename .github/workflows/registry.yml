@@ -22,12 +22,14 @@ jobs:
           python-version: "3.11"
 
       # generate --check re-derives the registry from the upstreams pinned in the
-      # script's WORKSPACES table (it shallow-clones nockchain / numerics / sequent
+      # script's WORKSPACES table (it clones the import-derived workspaces
       # on demand; urbit is explicit config and is never cloned) and fails on any
       # semantic drift from the committed registry.toml.
       - name: Check registry is in sync with sources
         run: python3 scripts/regen-registry.py generate --check
 
-      # validate confirms every dependency and alias in the committed file resolves.
+      # validate confirms every dependency and alias in the committed file resolves
+      # and every package file exists at its pinned ref (urbit and nockapp-pack
+      # are checked via a tree-only fetch).
       - name: Validate registry resolvability
         run: python3 scripts/regen-registry.py validate

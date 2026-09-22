@@ -1,7 +1,7 @@
 # TYPHOON
 ## TYPical HOON Registry
 
-**Status ~2026.6.22** Typhoon works with Nockup. `nockchain` is pinned at `6d29078` (2026-06-22); see `registry.toml` for the exact ref of every workspace. Update requests are welcome as issues or PRs.
+**Status ~2026.9.22** Typhoon works with Nockup. `nockchain` is pinned at `6ccb9e8` (2026-09-22) and `urbit` at kelvin `408k-2`; see `registry.toml` for the exact ref of every workspace. Pins are checked against upstream weekly (see [Upstream checks](#upstream-checks)). Update requests are welcome as issues or PRs.
 
 ![](./img/hero.jpg)
 
@@ -17,9 +17,11 @@ named Hoon source file plus its dependency closure), and **aliases** (short name
 | --- | --- | --- |
 | `urbit` | [urbit/urbit](https://github.com/urbit/urbit) | `/sys` stdlib (hoon, lull, zuse, arvo), vanes, `/lib` |
 | `nockchain` | [nockchain/nockchain](https://github.com/nockchain/nockchain) | Nockchain stdlib, tx-engine, dumbnet, wallet, bridge |
-| `numerics-*` | [urbit/numerics](https://github.com/urbit/numerics) | `lagoon` (linear algebra), `saloon` (decompositions), math primitives |
+| `numerics-*` | [urbit/numerics](https://github.com/urbit/numerics) | `lagoon` (linear algebra), `saloon` (decompositions), `rand` (random numbers), math primitives |
 | `sequent` | [jackfoxy/sequent](https://github.com/jackfoxy/sequent) | `seq` list operations |
 | `yard` | [urbit/yard](https://github.com/urbit/yard) | curated general-purpose libs (string, regex, csv, mip, math, etch, cram, number-to-words) |
+| `nockapp-pack` | [sigilante/nockapp-pack](https://github.com/sigilante/nockapp-pack) | example NockApps |
+| `nockasm` | [sigilante/nockasm](https://github.com/sigilante/nockasm) | legible Nock assembly: expander, target IR, jam lifter |
 
 ### Maintaining the registry
 
@@ -42,6 +44,9 @@ scripts/regen-registry.py generate --check
 
 # check that every dependency/alias resolves and every file exists
 scripts/regen-registry.py validate
+
+# list workspaces whose pinned ref lags upstream
+scripts/regen-registry.py outdated
 ```
 
 The script reuses local checkouts (defaults under your temp dir; override with
@@ -75,8 +80,19 @@ regenerated `registry.toml` **together with** the script change.
 
 - **Add an alias** — add a `(name, target)` pair to `ALIASES`.
 
-When you bump `nockchain`, update the ref quoted in the **Status** line at the top
-of this file too.
+When you bump `nockchain` or `urbit`, update the refs quoted in the **Status**
+line at the top of this file too.
+
+#### Upstream checks
+
+`.github/workflows/upstream-check.yml` runs every Monday (and on demand from
+the Actions tab). It runs `outdated`, which compares each pin against the head of
+the upstream default branch, or the newest kelvin release tag for `urbit` (see
+`UPSTREAM_TRACKING` in the script). It also re-runs `validate` at the current
+pins. If anything is behind, it opens or updates a single issue labelled
+`upstream-drift` with a table and compare links. Once every pin is current, the
+workflow closes that issue. Bumping stays a human step (the runbook above),
+because new upstream imports need a deliberate include/skip decision.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the maintenance policy (on-demand
 cadence, contribution rules) and the full upgrade runbook.

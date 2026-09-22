@@ -2,7 +2,8 @@
 
 Typhoon is the package registry that [Nockup](https://github.com/nockchain/nockchain/tree/master/crates/nockup)
 reads to resolve Hoon dependencies. It indexes pinned upstream git repositories
-(`urbit/urbit`, `nockchain/nockchain`, `urbit/numerics`, `jackfoxy/sequent`) and
+(`urbit/urbit`, `nockchain/nockchain`, `urbit/numerics`, `jackfoxy/sequent`,
+`urbit/yard`, `sigilante/nockapp-pack`, `sigilante/nockasm`) and
 exposes their Hoon source files as named packages with explicit dependency
 closures.
 
@@ -71,10 +72,15 @@ the pinned ref otherwise. Point it at existing checkouts with
 
 ## Maintenance policy
 
-- **Cadence: on-demand.** Refs are bumped when a user requests it or when a
-  breaking upstream change lands. Open an issue or PR to request a bump.
-  Because every workspace is pinned by commit, the registry is deterministic
-  and reproducible between bumps.
+- **Cadence: weekly check, deliberate bumps.** The `upstream-check` workflow
+  compares every pin against upstream each Monday and keeps an
+  `upstream-drift` issue open while anything is behind
+  (`scripts/regen-registry.py outdated` runs the same check locally). A
+  maintainer works that issue through the runbook above at least **monthly**,
+  and sooner for a new `urbit` kelvin release, a breaking `nockchain` change,
+  or a user request. Set a workspace to `"hold"` in `UPSTREAM_TRACKING` to
+  freeze it on purpose. Because every workspace is pinned by commit, the
+  registry is deterministic and reproducible between bumps.
 - **New packages** go through the runbook above; reusable libraries are added,
   internal/test-only modules are not.
 - **Contributions** should change the script configuration and include the
