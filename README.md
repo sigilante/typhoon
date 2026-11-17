@@ -89,9 +89,13 @@ line at the top of this file too.
 the Actions tab). It runs `outdated`, which compares each pin against the head of
 the upstream default branch, or the newest kelvin release tag for `urbit` (see
 `UPSTREAM_TRACKING` in the script). It also re-runs `validate` at the current
-pins. If anything is behind, it opens or updates a single issue labelled
-`upstream-drift` with a table and compare links. Once every pin is current, the
-workflow closes that issue. Bumping stays a human step (the runbook above),
+pins. If anything is behind, it runs the mechanical half of the runbook:
+`outdated --bump` rewrites the stale refs, then it runs `generate` and
+`validate`. It opens or refreshes a single PR from the `upstream-bump` branch,
+whose body carries the changelog, any generator warnings and the validation
+result. The PR opens as a draft when there are warnings or validation fails. An
+issue labelled `upstream-drift` links to the PR. Once every pin is current, the
+workflow closes that issue and any leftover bump PR. Merging stays a human step,
 because new upstream imports need a deliberate include/skip decision.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the maintenance policy (on-demand
