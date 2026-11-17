@@ -20,6 +20,7 @@ Usage:
     regen-registry.py generate --check        # diff vs existing, non-zero if drift
     regen-registry.py validate [registry.toml] # resolvability + file existence
     regen-registry.py outdated [--markdown] [--exit-code]  # pins vs upstream (exit 10 if stale)
+    regen-registry.py outdated --bump         # also rewrite stale refs in WORKSPACES below
 
 Checkouts for the derived families default to the paths in CHECKOUTS below and
 can be overridden with `--checkout family=/path` (repeatable) and must already
@@ -725,7 +726,33 @@ def outdated(markdown=False):
     else:
         for name, mode, pinned, latest, status, compare in rows:
             print(f"{status:9} {name:16} {mode:7} pinned={pinned:12} latest={latest:12} {compare}")
-    return stale
+    return {name: latest for name, _, _, latest, status, _ in rows if status == "OUTDATED"}
+
+
+def bump_refs(new_refs, path=__file__):
+    """Rewrite `"ref"` in this script's WORKSPACES table for each name -> ref.
+
+    Edits the source text in place (the table is the source of truth), touching
+    only the first `"ref":` line inside each named workspace's block.
+    """
+    with open(path, encoding="utf-8") as fh:
+        lines = fh.read().split("\n")
+    pending = dict(new_refs)
+    current = None
+    for i, line in enumerate(lines):
+        m = re.match(r'^    "([^"]+)": \{$', line)
+        if m:
+            current = m[1]
+            continue
+        if current in pending:
+            m = re.match(r'^(\s+"ref": )"[^"]*",$', line)
+            if m:
+                lines[i] = f'{m[1]}"{pending.pop(current)}",'
+                current = None
+    if pending:
+        raise SystemExit(f"bump: no ref line found for {sorted(pending)}")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines))
 
 
 # ---------------------------------------------------------------------------
@@ -762,6 +789,8 @@ def main(argv=None):
     o.add_argument("--markdown", action="store_true", help="emit a Markdown table")
     o.add_argument("--exit-code", action="store_true",
                    help="exit 10 if any workspace is outdated")
+    o.add_argument("--bump", action="store_true",
+                   help="rewrite the stale refs in this script's WORKSPACES table to latest")
 
     args = ap.parse_args(argv)
     overrides = parse_overrides(getattr(args, "checkout", None))
@@ -784,6 +813,9 @@ def main(argv=None):
 
     if args.cmd == "outdated":
         stale = outdated(markdown=args.markdown)
+        if args.bump and stale:
+            bump_refs(stale)
+            print(f"bumped: {', '.join(f'{k}={v}' for k, v in stale.items())}", file=sys.stderr)
         return 10 if (stale and args.exit_code) else 0
 
 

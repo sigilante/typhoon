@@ -73,10 +73,11 @@ the pinned ref otherwise. Point it at existing checkouts with
 ## Maintenance policy
 
 - **Cadence: weekly check, deliberate bumps.** The `upstream-check` workflow
-  compares every pin against upstream each Monday and keeps an
-  `upstream-drift` issue open while anything is behind
-  (`scripts/regen-registry.py outdated` runs the same check locally). A
-  maintainer works that issue through the runbook above at least **monthly**,
+  compares every pin against upstream each Monday. While anything is behind,
+  it keeps a bump PR (branch `upstream-bump`) and an `upstream-drift` issue
+  open (`scripts/regen-registry.py outdated [--bump]` does the same locally).
+  A maintainer reviews that PR against the runbook above (warnings, README
+  status line, Nockup smoke test after merge) at least **monthly**,
   and sooner for a new `urbit` kelvin release, a breaking `nockchain` change,
   or a user request. Set a workspace to `"hold"` in `UPSTREAM_TRACKING` to
   freeze it on purpose. Because every workspace is pinned by commit, the

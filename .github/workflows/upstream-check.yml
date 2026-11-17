@@ -2,10 +2,14 @@ name: upstream-check
 
 # Weekly drift check: compares every pinned workspace ref in
 # scripts/regen-registry.py against its upstream (default-branch head, or the
-# newest kelvin release for urbit) and keeps a single tracking issue, labelled
-# `upstream-drift`, in sync with the result. Bumping is still a human step --
-# see "Upgrade runbook" in CONTRIBUTING.md -- because new upstream imports need
-# a deliberate include/skip decision.
+# newest kelvin release for urbit). When anything is stale it does the
+# mechanical part of the upgrade runbook -- bump the refs, regenerate
+# registry.toml, validate -- and opens (or refreshes) a single PR from the
+# `upstream-bump` branch. Merging stays a human step: new upstream imports need
+# a deliberate include/skip decision, so the PR body carries the changelog and
+# any generator warnings, and the PR is a draft if anything needs attention.
+# A tracking issue labelled `upstream-drift` links to the PR and closes itself
+# once every pin is current.
 
 on:
   schedule:
@@ -13,8 +17,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  issues: write
+  contents: write        # push the upstream-bump branch
+  pull-requests: write   # open / update the bump PR
+  issues: write          # tracking issue
+  actions: write         # dispatch registry.yml on the bump branch
+
+concurrency:
+  group: upstream-check
+  cancel-in-progress: false
 
 jobs:
   outdated:
@@ -45,10 +55,97 @@ jobs:
       - name: Validate registry at current pins
         run: python3 scripts/regen-registry.py validate
 
+      # Mechanical upgrade (runbook steps 1-4) on a fresh branch from master.
+      # Nothing here fails the job: warnings and validation failures are
+      # reported in the PR body and turn the PR into a draft instead.
+      - name: Bump stale pins and regenerate
+        id: bump
+        if: steps.check.outputs.stale == 'true'
+        run: |
+          git switch -C upstream-bump
+          python3 scripts/regen-registry.py outdated --bump > /dev/null
+          python3 scripts/regen-registry.py generate --check > changelog.txt 2> warnings.raw || true
+          grep '^warning: ' warnings.raw > warnings.txt || true
+          python3 scripts/regen-registry.py generate 2>/dev/null || true
+          if python3 scripts/regen-registry.py validate > validate.txt 2>&1; then
+            echo "valid=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "valid=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -s warnings.txt ]; then echo "warned=true"; else echo "warned=false"; fi >> "$GITHUB_OUTPUT"
+          cat changelog.txt warnings.txt validate.txt
+
+      - name: Open or update bump PR
+        id: pr
+        if: steps.check.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VALID: ${{ steps.bump.outputs.valid }}
+          WARNED: ${{ steps.bump.outputs.warned }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/regen-registry.py registry.toml
+          if git diff --cached --quiet; then echo "nothing to bump"; exit 0; fi
+          bumped=$(git diff --cached -U0 scripts/regen-registry.py | grep -c '^+ *"ref"' || true)
+          git commit -q -m "Bump stale upstream pins ($(date -u +%Y-%m-%d))" \
+            -m "Automated by upstream-check: $RUN_URL"
+          git push --force origin upstream-bump
+
+          {
+            echo "Automated bump of ${bumped} pinned workspace ref(s) to upstream head ([run]($RUN_URL))."
+            echo
+            cat report.md
+            echo
+            echo "### Registry changelog (\`generate --check\` against master)"
+            echo '```'; cat changelog.txt; echo '```'
+            if [ "$WARNED" = "true" ]; then
+              echo
+              echo "### :warning: Generator warnings — decide include/skip before merging"
+              echo '```'; cat warnings.txt; echo '```'
+            fi
+            echo
+            if [ "$VALID" = "true" ]; then
+              echo "### \`validate\`: passed"
+            else
+              echo "### :x: \`validate\`: FAILED"
+            fi
+            echo '```'; cat validate.txt; echo '```'
+            echo
+            echo "Before merging: read the warnings, update the README status line if \`nockchain\` or \`urbit\` moved,"
+            echo "and smoke-test with Nockup after merge (CONTRIBUTING.md → Upgrade runbook, step 5)."
+            echo
+            echo "_This PR is maintained by the upstream-check workflow; the branch is force-pushed each week while drift persists._"
+          } > pr.md
+
+          draft=()
+          if [ "$VALID" != "true" ] || [ "$WARNED" = "true" ]; then draft=(--draft); fi
+          pr=$(gh pr list --head upstream-bump --state open --json url --jq '.[0].url // empty')
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --body-file pr.md
+            if [ ${#draft[@]} -gt 0 ]; then gh pr ready "$pr" --undo || true
+            else gh pr ready "$pr" || true; fi
+          elif pr=$(gh pr create --base master --head upstream-bump \
+                      --title "Bump stale upstream pins" --body-file pr.md "${draft[@]}"); then
+            :
+          else
+            # Repo setting "Allow GitHub Actions to create and approve pull
+            # requests" is off: fall back to a compare link in the issue.
+            pr="${{ github.server_url }}/${{ github.repository }}/compare/master...upstream-bump?expand=1"
+            echo "::warning::could not open PR; enable Settings → Actions → General → Allow GitHub Actions to create and approve pull requests"
+          fi
+          echo "url=$pr" >> "$GITHUB_OUTPUT"
+
+          # PRs and pushes made with GITHUB_TOKEN do not trigger other
+          # workflows, so run the registry gate on the bump branch explicitly.
+          gh workflow run registry.yml --ref upstream-bump || true
+
       - name: Update tracking issue
         env:
           GH_TOKEN: ${{ github.token }}
           STALE: ${{ steps.check.outputs.stale }}
+          PR_URL: ${{ steps.pr.outputs.url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           gh label create upstream-drift --color FBCA04 \
@@ -60,9 +157,8 @@ jobs:
               echo
               cat report.md
               echo
-              echo "To bump: edit \`ref\` in \`WORKSPACES\` (\`scripts/regen-registry.py\`), then"
-              echo "\`generate\` → \`generate --check\` → \`validate\`, and read any"
-              echo "\`… unresolved\` / \`not a package\` warnings. See CONTRIBUTING.md → Upgrade runbook."
+              echo "**Bump PR: $PR_URL** — review the changelog and any warnings there, then merge."
+              echo "See CONTRIBUTING.md → Upgrade runbook."
               echo
               echo "_This issue is maintained by the upstream-check workflow and closes itself once every pin is current._"
             } > body.md
@@ -72,6 +168,14 @@ jobs:
               gh issue create --title "Upstream drift: pinned workspaces are behind" \
                 --label upstream-drift --body-file body.md
             fi
-          elif [ -n "$issue" ]; then
+          else
+            # Master is current (e.g. a human bumped by hand): retire any
+            # leftover automated PR and its branch.
+            stale_pr=$(gh pr list --head upstream-bump --state open --json number --jq '.[0].number // empty')
+            if [ -n "$stale_pr" ]; then
+              gh pr close "$stale_pr" --delete-branch --comment "Superseded: master is current as of $(date -u +%Y-%m-%d)."
+            fi
+          fi
+          if [ "$STALE" != "true" ] && [ -n "$issue" ]; then
             gh issue close "$issue" --comment "All pinned upstreams are current as of $(date -u +%Y-%m-%d) ([run]($RUN_URL))."
           fi
