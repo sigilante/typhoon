@@ -33,12 +33,12 @@ jobs:
       # Always work from master (a manual dispatch from another branch must not
       # leak that branch's commits into the bump PR), with history so we can
       # tell bot commits on upstream-bump from a maintainer's.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: master
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
 
