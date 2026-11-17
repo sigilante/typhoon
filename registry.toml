@@ -22,31 +22,31 @@ root_path = "pkg/arvo"
 
 [workspace.nockchain]
 git_url = "https://github.com/nockchain/nockchain"
-ref = "6ccb9e8"
+ref = "ed1edfc"
 description = "Nockchain standard library"
 root_path = "hoon"
 
 [workspace.numerics-math]
 git_url = "https://github.com/urbit/numerics"
-ref = "047df07"
+ref = "9eb9500"
 description = "Numerics: shared math primitives (libmath desk)"
 root_path = "libmath/desk"
 
 [workspace.numerics-lagoon]
 git_url = "https://github.com/urbit/numerics"
-ref = "047df07"
+ref = "9eb9500"
 description = "Lagoon: vector/matrix linear algebra (lagoon desk)"
 root_path = "lagoon/desk"
 
 [workspace.numerics-saloon]
 git_url = "https://github.com/urbit/numerics"
-ref = "047df07"
+ref = "9eb9500"
 description = "Saloon: eigen/decomposition routines (saloon desk)"
 root_path = "saloon/desk"
 
 [workspace.numerics-rand]
 git_url = "https://github.com/urbit/numerics"
-ref = "047df07"
+ref = "9eb9500"
 description = "Numerics: random number generation over the math primitives (librand desk)"
 root_path = "librand/desk"
 
@@ -373,7 +373,7 @@ name = "nockchain/apps/dumbnet/lib/consensus"
 workspace = "nockchain"
 path = "apps/dumbnet/lib"
 file = "consensus.hoon"
-dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/pow", "nockchain/common/tx-engine", "nockchain/apps/dumbnet/lib/asert", "nockchain/common/h-zoon"]
+dependencies = ["nockchain/apps/dumbnet/lib/types", "nockchain/common/stark/prover", "nockchain/common/pow", "nockchain/common/tx-engine", "nockchain/apps/dumbnet/lib/asert", "nockchain/dat/legacy-ai-checkpoints", "nockchain/common/h-zoon"]
 
 [[package]]
 name = "nockchain/apps/dumbnet/lib/derived"
@@ -780,6 +780,216 @@ workspace = "nockchain"
 path = "dat"
 file = "constraints-v2.hoon"
 dependencies = ["nockchain/common/zeke", "nockchain/common/v2/nock-common"]
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-126000-126999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-126000-126999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-127000-127999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-127000-127999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-128000-128999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-128000-128999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-129000-129999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-129000-129999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-130000-130999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-130000-130999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-131000-131999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-131000-131999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-132000-132999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-132000-132999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-133000-133999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-133000-133999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-134000-134999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-134000-134999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-135000-135999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-135000-135999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-136000-136999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-136000-136999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-137000-137999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-137000-137999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-138000-138999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-138000-138999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-139000-139999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-139000-139999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-140000-140999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-140000-140999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-141000-141999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-141000-141999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-142000-142999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-142000-142999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-143000-143999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-143000-143999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-144000-144999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-144000-144999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-145000-145999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-145000-145999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-146000-146999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-146000-146999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-147000-147999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-147000-147999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-148000-148999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-148000-148999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-149000-149999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-149000-149999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-150000-150999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-150000-150999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-151000-151999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-151000-151999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-152000-152999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-152000-152999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-153000-153999"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-153000-153999.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoint-chunks/heights-154000-154499"
+workspace = "nockchain"
+path = "dat/legacy-ai-checkpoint-chunks"
+file = "heights-154000-154499.hoon"
+dependencies = []
+
+[[package]]
+name = "nockchain/dat/legacy-ai-checkpoints"
+workspace = "nockchain"
+path = "dat"
+file = "legacy-ai-checkpoints.hoon"
+dependencies = ["nockchain/common/tx-engine", "nockchain/common/zoon", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-126000-126999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-127000-127999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-128000-128999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-129000-129999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-130000-130999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-131000-131999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-132000-132999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-133000-133999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-134000-134999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-135000-135999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-136000-136999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-137000-137999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-138000-138999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-139000-139999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-140000-140999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-141000-141999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-142000-142999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-143000-143999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-144000-144999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-145000-145999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-146000-146999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-147000-147999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-148000-148999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-149000-149999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-150000-150999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-151000-151999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-152000-152999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-153000-153999", "nockchain/dat/legacy-ai-checkpoint-chunks/heights-154000-154499"]
 
 [[package]]
 name = "nockchain/dat/softed-constraints"

@@ -1,7 +1,7 @@
 # TYPHOON
 ## TYPical HOON Registry
 
-**Status ~2026.9.22** Typhoon works with Nockup. `nockchain` is pinned at `6ccb9e8` (2026-09-22) and `urbit` at kelvin `408k-2`; see `registry.toml` for the exact ref of every workspace. Pins are checked against upstream weekly (see [Upstream checks](#upstream-checks)). Update requests are welcome as issues or PRs.
+**Status ~2026.11.18** Typhoon works with Nockup. `nockchain` is pinned at `ed1edfc` (2026-10-26) and `urbit` at kelvin `408k-2`; see `registry.toml` for the exact ref of every workspace. Pins are checked against upstream weekly (see [Upstream checks](#upstream-checks)). Update requests are welcome as issues or PRs.
 
 ![](./img/hero.jpg)
 
